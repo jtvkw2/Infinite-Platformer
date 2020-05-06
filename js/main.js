@@ -1,7 +1,12 @@
+var num = 2;
+var platforms = [];
+
 function startGame() {
     myGamePiece = new component(30, 30, "red", 10, 120);
-    myGamePiece.gravity = 0.1;
+    myGamePiece.gravity = 0;
     myGameArea.start();
+    myGameArea.createPlat();
+    myGameArea.renderPlat();
 }
 
 var myGameArea = {
@@ -23,6 +28,24 @@ var myGameArea = {
         },
     clear : function() {
         this.context.clearRect(0, 0, this.canvas.width, this.canvas.height);
+    },
+    createPlat: function(){
+      for(i = 0; i < num; i++) {
+          platforms.push(
+              {
+              x: 100 * i,
+              y: 200 + (30 * i),
+              width: 110,
+              height: 15
+              }
+          );
+      }
+    },
+    renderPlat: function(){
+      var ctx = this.canvas.getContext("2d");
+      ctx.fillStyle = "#45597E";
+      ctx.fillRect(platforms[0].x, platforms[0].y, platforms[0].width, platforms[0].height);
+      ctx.fillRect(platforms[1].x, platforms[1].y, platforms[1].width,platforms[1]. height);
     }
 }
 
@@ -35,7 +58,7 @@ function component(width, height, color, x, y, type) {
     this.x = x;
     this.y = y;
     this.gravity = 0;
-    this.gravitySpeed = 0;
+    this.gravitySpeed = 2;
     this.update = function() {
         ctx = myGameArea.context;
         if (this.type == "text") {
@@ -51,40 +74,35 @@ function component(width, height, color, x, y, type) {
         this.gravitySpeed += this.gravity;
         this.x += this.speedX;
         this.y += this.speedY + this.gravitySpeed;
-        this.hitBottom();
-    }
-    this.hitBottom = function() {
-        var rockbottom = myGameArea.canvas.height - this.height;
-        if (this.y > rockbottom) {
-            this.y = rockbottom;
+          if(collision(myGamePiece, platforms[0]) === true || collision(myGamePiece, platforms[1])){
             this.gravitySpeed = 0;
-        }
-    }
-    this.crashWith = function(otherobj) {
-        var myleft = this.x;
-        var myright = this.x + (this.width);
-        var mytop = this.y;
-        var mybottom = this.y + (this.height);
-        var otherleft = otherobj.x;
-        var otherright = otherobj.x + (otherobj.width);
-        var othertop = otherobj.y;
-        var otherbottom = otherobj.y + (otherobj.height);
-        var crash = true;
-        if ((mybottom < othertop) || (mytop > otherbottom) || (myright < otherleft) || (myleft > otherright)) {
-            crash = false;
-        }
-        return crash;
+          }else{
+            this.gravitySpeed = 2;
+          }
     }
 }
 
 function updateGameArea() {
-    myGameArea.clear();
-    myGamePiece.speedX = 0;
-    myGamePiece.speedY = 0;
-    if (myGameArea.keys && myGameArea.keys[37]) {myGamePiece.speedX = -1; }
-    if (myGameArea.keys && myGameArea.keys[39]) {myGamePiece.speedX = 1; }
-    if (myGameArea.keys && myGameArea.keys[38]) {myGamePiece.speedY = -4; }
-    if (myGameArea.keys && myGameArea.keys[40]) {myGamePiece.speedY = 1; }
-    myGamePiece.newPos();
-    myGamePiece.update();
+  myGameArea.clear();
+  console.log(collision(myGamePiece, platforms[0]));
+  myGamePiece.speedX = 0;
+  myGamePiece.speedY = 0;
+  if (myGameArea.keys && myGameArea.keys[37]) {myGamePiece.speedX = -1; }
+  if (myGameArea.keys && myGameArea.keys[39]) {myGamePiece.speedX = 1; }
+  if (myGameArea.keys && myGameArea.keys[38]) {myGamePiece.speedY = -4; }
+  if (myGameArea.keys && myGameArea.keys[40]) {myGamePiece.speedY = 1; }
+  myGamePiece.newPos();
+  myGameArea.renderPlat();
+  myGamePiece.update();
 }
+
+var collision = function(r1, r2) {
+  if (r1.x + r1.width > r2.x &&
+      r1.x < r2.x + r2.width &&
+      r2.y + r2.height > r1.y &&
+      r2.y < r1.y + r1.height) {
+        return true;
+  } else {
+    return false;
+  }
+};
