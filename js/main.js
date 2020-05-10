@@ -1,8 +1,10 @@
-var num = 2;
+var num = 3;
+var myScore;
 var platforms = [];
 
 function startGame() {
     myGamePiece = new component(30, 30, "red", 10, 120);
+    myScore = new component("30px", "Consolas", "black", 280, 40, "text");
     myGamePiece.gravity = 0;
     myGameArea.start();
     myGameArea.createPlat();
@@ -34,7 +36,7 @@ var myGameArea = {
           platforms.push(
               {
               x: 100 * i,
-              y: 200 + (30 * i),
+              y: 200,
               width: 110,
               height: 15
               }
@@ -44,8 +46,9 @@ var myGameArea = {
     renderPlat: function(){
       var ctx = this.canvas.getContext("2d");
       ctx.fillStyle = "#45597E";
-      ctx.fillRect(platforms[0].x, platforms[0].y, platforms[0].width, platforms[0].height);
-      ctx.fillRect(platforms[1].x, platforms[1].y, platforms[1].width,platforms[1]. height);
+      for(i=0; i<num; i++){
+        ctx.fillRect(platforms[i].x, platforms[i].y, platforms[i].width, platforms[i].height);
+      }
     }
 }
 
@@ -71,29 +74,35 @@ function component(width, height, color, x, y, type) {
         }
     }
     this.newPos = function() {
-        this.gravitySpeed += this.gravity;
-        this.x += this.speedX;
-        this.y += this.speedY + this.gravitySpeed;
-          if(collision(myGamePiece, platforms[0]) === true || collision(myGamePiece, platforms[1])){
-            this.gravitySpeed = 0;
-          }else{
-            this.gravitySpeed = 2;
-          }
-    }
+      this.gravitySpeed += this.gravity;
+      this.x += this.speedX;
+      this.y += this.speedY + this.gravitySpeed;
+      console.log(getGravitySpeed());
+      if(getGravitySpeed() === true){
+        this.gravitySpeed = 0;
+      }else{
+        this.gravitySpeed = 2;
+      }
+  }
 }
 
 function updateGameArea() {
   myGameArea.clear();
-  console.log(collision(myGamePiece, platforms[0]));
+  myGameArea.frameNo += 1;
   myGamePiece.speedX = 0;
   myGamePiece.speedY = 0;
   if (myGameArea.keys && myGameArea.keys[37]) {myGamePiece.speedX = -1; }
   if (myGameArea.keys && myGameArea.keys[39]) {myGamePiece.speedX = 1; }
   if (myGameArea.keys && myGameArea.keys[38]) {myGamePiece.speedY = -4; }
   if (myGameArea.keys && myGameArea.keys[40]) {myGamePiece.speedY = 1; }
+  myScore.text = "SCORE: " + Math.round(myGameArea.frameNo/10);
+  myScore.update();
   myGamePiece.newPos();
   myGameArea.renderPlat();
   myGamePiece.update();
+  for (i = 0; i < num; i += 1) {
+    platforms[i].x += -1;
+  }
 }
 
 var collision = function(r1, r2) {
@@ -106,3 +115,13 @@ var collision = function(r1, r2) {
     return false;
   }
 };
+
+var getGravitySpeed = function(){
+  for(i = 0; i < num; i += 1){
+    if(collision(myGamePiece, platforms[i])){
+      return true;
+    }else{
+      return false;
+    }
+  }
+}
