@@ -1,9 +1,17 @@
-var num = 3;
+var num = 100;
 var myScore;
 var platforms = [];
+var endWall = [
+    {
+    x: 0,
+    y: 0,
+    width: 10,
+    height: 270
+    }
+];
 
 function startGame() {
-    myGamePiece = new component(30, 30, "red", 10, 120);
+    myGamePiece = new component(30, 30, "red", 30, 120);
     myScore = new component("30px", "Consolas", "black", 280, 40, "text");
     myGamePiece.gravity = 0;
     myGameArea.start();
@@ -35,9 +43,9 @@ var myGameArea = {
       for(i = 0; i < num; i++) {
           platforms.push(
               {
-              x: 100 * i,
-              y: 200,
-              width: 110,
+              x: 100 * i * getRandomArbitrary(2,2.5),
+              y: 200 + getRandomArbitrary(-40,40),
+              width: 110 + getRandomArbitrary(10,40),
               height: 15
               }
           );
@@ -49,6 +57,12 @@ var myGameArea = {
       for(i=0; i<num; i++){
         ctx.fillRect(platforms[i].x, platforms[i].y, platforms[i].width, platforms[i].height);
       }
+
+    },
+    renderWall: function(){
+      var ctx = this.canvas.getContext("2d");
+      ctx.fillStyle = "	#8B0000";
+      ctx.fillRect(endWall[0].x, endWall[0].y, endWall[0].width, endWall[0].height);
     }
 }
 
@@ -84,9 +98,17 @@ function component(width, height, color, x, y, type) {
         this.gravitySpeed = 2;
       }
   }
+  this.gameOver = function() {
+    if(collision(myGamePiece, endWall[0]) === true || myGamePiece.y > 270){
+      alert("GAME OVER");
+      document.location.reload();
+      clearInterval(interval);
+    }
+  }
 }
 
 function updateGameArea() {
+  console.log(myGamePiece.x,myGamePiece.y)
   myGameArea.clear();
   myGameArea.frameNo += 1;
   myGamePiece.speedX = 0;
@@ -98,12 +120,15 @@ function updateGameArea() {
   myScore.text = "SCORE: " + Math.round(myGameArea.frameNo/10);
   myScore.update();
   myGamePiece.newPos();
+  myGamePiece.gameOver();
   myGameArea.renderPlat();
+  myGameArea.renderWall();
   myGamePiece.update();
   for (i = 0; i < num; i += 1) {
     platforms[i].x += -1;
   }
 }
+
 
 var collision = function(r1, r2) {
   if (r1.x + r1.width > r2.x &&
@@ -117,11 +142,16 @@ var collision = function(r1, r2) {
 };
 
 var getGravitySpeed = function(){
-  for(i = 0; i < num; i += 1){
+ var i = 0;
+  while(i < num){
     if(collision(myGamePiece, platforms[i])){
       return true;
     }else{
-      return false;
+      i++;
     }
   }
+}
+
+function getRandomArbitrary(min, max) {
+  return Math.random() * (max - min) + min;
 }
