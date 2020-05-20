@@ -1,27 +1,20 @@
-var num = 100;
-var myScore;
-var platforms = [];
-var endWall = [
-    {
-    x: 0,
-    y: 0,
-    width: 10,
-    height: 270
-    }
-];
+var num = 100; //Number of platforms generated on the level
+var myScore; //Undefined score that will increase with frames as player survies
+var platforms = []; //Initial array to store all the platforms
+var endWall = [{x: 0, y: 0, width: 10, height: 270 }]; //Ending wall that follows and kills player
 
-function startGame() {
-    myGamePiece = new component(30, 30, "red", 30, 120);
-    myScore = new component("30px", "Consolas", "black", 280, 40, "text");
+function startGame() { //initial function to start the game, called in index
+    myGamePiece = new component(30, 30, "red", 30, 120); //the player
+    myScore = new component("30px", "Consolas", "black", 280, 40, "text"); //Main score listed in corner of screen
     myGamePiece.gravity = 0;
     myGameArea.start();
     myGameArea.createPlat();
     myGameArea.renderPlat();
 }
 
-var myGameArea = {
+var myGameArea = {//variable for all function related to the canvas
     canvas : document.createElement("canvas"),
-    start : function() {
+    start : function() {//Initalizes the canvas
         this.canvas.width = 480;
         this.canvas.height = 270;
         this.context = this.canvas.getContext("2d");
@@ -36,10 +29,10 @@ var myGameArea = {
             myGameArea.keys[e.keyCode] = false;
           })
         },
-    clear : function() {
+    clear : function() { //clears the canvas to be uptated
         this.context.clearRect(0, 0, this.canvas.width, this.canvas.height);
     },
-    createPlat: function(){
+    createPlat: function(){ //creates platforms and pushes them to array
       for(i = 0; i < num; i++) {
           platforms.push(
               {
@@ -51,7 +44,7 @@ var myGameArea = {
           );
       }
     },
-    renderPlat: function(){
+    renderPlat: function(){ //renders platforms to screen
       var ctx = this.canvas.getContext("2d");
       ctx.fillStyle = "#45597E";
       for(i=0; i<num; i++){
@@ -59,14 +52,14 @@ var myGameArea = {
       }
 
     },
-    renderWall: function(){
+    renderWall: function(){ //renders endWall to screen
       var ctx = this.canvas.getContext("2d");
       ctx.fillStyle = "	#8B0000";
       ctx.fillRect(endWall[0].x, endWall[0].y, endWall[0].width, endWall[0].height);
     }
 }
 
-function component(width, height, color, x, y, type) {
+function component(width, height, color, x, y, type) { //establishs all players and entites
     this.type = type;
     this.width = width;
     this.height = height;
@@ -87,7 +80,7 @@ function component(width, height, color, x, y, type) {
             ctx.fillRect(this.x, this.y, this.width, this.height);
         }
     }
-    this.newPos = function() {
+    this.newPos = function() { //Updates new location of player and entites
       this.gravitySpeed += this.gravity;
       this.x += this.speedX;
       this.y += this.speedY + this.gravitySpeed;
@@ -98,7 +91,7 @@ function component(width, height, color, x, y, type) {
         this.gravitySpeed = 2;
       }
   }
-  this.gameOver = function() {
+  this.gameOver = function() { //Creates end state of game
     if(collision(myGamePiece, endWall[0]) === true || myGamePiece.y > 270){
       alert("GAME OVER");
       document.location.reload();
@@ -107,7 +100,7 @@ function component(width, height, color, x, y, type) {
   }
 }
 
-function updateGameArea() {
+function updateGameArea() { //calls all listed function every frame to update
   console.log(myGamePiece.x,myGamePiece.y)
   myGameArea.clear();
   myGameArea.frameNo += 1;
@@ -129,7 +122,7 @@ function updateGameArea() {
   }
 }
 
-
+//Function to Check for Collisions between two entities
 var collision = function(r1, r2) {
   if (r1.x + r1.width > r2.x &&
       r1.x < r2.x + r2.width &&
@@ -141,7 +134,7 @@ var collision = function(r1, r2) {
   }
 };
 
-var getGravitySpeed = function(){
+var getGravitySpeed = function(){ //checks to see if player is on a platform and stops them from falling
  var i = 0;
   while(i < num){
     if(collision(myGamePiece, platforms[i])){
@@ -152,6 +145,6 @@ var getGravitySpeed = function(){
   }
 }
 
-function getRandomArbitrary(min, max) {
+function getRandomArbitrary(min, max) { //gives a random number between a min and max number
   return Math.random() * (max - min) + min;
 }
