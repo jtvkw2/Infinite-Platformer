@@ -1,5 +1,6 @@
 var num = 100; //Number of platforms generated on the level
 var myScore; //Undefined score that will increase with frames as player survies
+var jumpTime = 0; //Used to time jumps in air
 var platforms = []; //Initial array to store all the platforms
 var endWall = [{x: 0, y: 0, width: 10, height: 270 }]; //Ending wall that follows and kills player
 
@@ -84,7 +85,6 @@ function component(width, height, color, x, y, type) { //establishs all players 
       this.gravitySpeed += this.gravity;
       this.x += this.speedX;
       this.y += this.speedY + this.gravitySpeed;
-      console.log(getGravitySpeed());
       if(getGravitySpeed() === true){
         this.gravitySpeed = 0;
       }else{
@@ -101,15 +101,22 @@ function component(width, height, color, x, y, type) { //establishs all players 
 }
 
 function updateGameArea() { //calls all listed function every frame to update
-  console.log(myGamePiece.x,myGamePiece.y)
   myGameArea.clear();
   myGameArea.frameNo += 1;
   myGamePiece.speedX = 0;
   myGamePiece.speedY = 0;
+  if(getGravitySpeed() == true){jumpTime = 0;}
   if (myGameArea.keys && myGameArea.keys[37]) {myGamePiece.speedX = -1; }
   if (myGameArea.keys && myGameArea.keys[39]) {myGamePiece.speedX = 1; }
-  if (myGameArea.keys && myGameArea.keys[38]) {myGamePiece.speedY = -4; }
-  if (myGameArea.keys && myGameArea.keys[40]) {myGamePiece.speedY = 1; }
+  if (myGameArea.keys && myGameArea.keys[38] && jumpTime < 50) {
+    myGamePiece.speedY = -4;
+    jumpTime++;
+  }
+  if (myGameArea.keys && myGameArea.keys[38] && jumpTime == 50) {
+    myGamePiece.speedY = 0;
+    jumpTime++;
+  }
+  if (myGameArea.keys && myGameArea.keys[40] && getGravitySpeed() === false) {myGamePiece.speedY = 1; }
   myScore.text = "SCORE: " + Math.round(myGameArea.frameNo/10);
   myScore.update();
   myGamePiece.newPos();
