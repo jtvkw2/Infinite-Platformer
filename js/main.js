@@ -103,17 +103,23 @@ function component(width, height, color, x, y, type) { //establishs all players 
 function updateGameArea() { //calls all listed function every frame to update
   myGameArea.clear();
   myGameArea.frameNo += 1;
+  myGamePiece.height = 30;
+  myGamePiece.width = 30;
   myGamePiece.speedX = 0;
   myGamePiece.speedY = 0;
   if(getGravitySpeed() == true){jumpTime = 0;}
   if (myGameArea.keys && myGameArea.keys[37]) {myGamePiece.speedX = -1; }
-  if (myGameArea.keys && myGameArea.keys[39]) {myGamePiece.speedX = 1; }
+  if (myGameArea.keys && myGameArea.keys[39]) {
+    myGamePiece.speedX = 1;
+   }
   if (myGameArea.keys && myGameArea.keys[38] && jumpTime < 50) {
     myGamePiece.speedY = -4;
+    myGamePiece.height = 35;
     jumpTime++;
   }
   if (myGameArea.keys && myGameArea.keys[38] && jumpTime == 50) {
     myGamePiece.speedY = 0;
+    myGamePiece.height = 30;
     jumpTime++;
   }
   if (myGameArea.keys && myGameArea.keys[40] && getGravitySpeed() === false) {myGamePiece.speedY = 1; }
