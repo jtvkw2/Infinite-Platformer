@@ -1,4 +1,5 @@
-var num = 100; //Number of platforms generated on the level
+var num = 3; //Number of platforms generated on the level
+var currentPlat = 1; //Current platorm the player is on
 var myScore; //Undefined score that will increase with frames as player survies
 var jumpTime = 0; //Used to time jumps in air
 var platforms = []; //Initial array to store all the platforms
@@ -48,10 +49,20 @@ var myGameArea = {//variable for all function related to the canvas
     renderPlat: function(){ //renders platforms to screen
       var ctx = this.canvas.getContext("2d");
       ctx.fillStyle = "#45597E";
-      for(i=0; i<num; i++){
+      for(i=0; i<platforms.length; i++){
         ctx.fillRect(platforms[i].x, platforms[i].y, platforms[i].width, platforms[i].height);
       }
 
+    },
+    newPlat: function(){
+      platforms.push(
+          {
+          x: 100+(250 * getRandomArbitrary(1.25, 1.5)) + (currentPlat*200),
+          y: 200 + getRandomArbitrary(-40,40),
+          width: 110 + getRandomArbitrary(10,40),
+          height: 15
+          }
+      );
     },
     renderWall: function(){ //renders endWall to screen
       var ctx = this.canvas.getContext("2d");
@@ -126,13 +137,19 @@ function updateGameArea() { //calls all listed function every frame to update
   myScore.text = "SCORE: " + Math.round(myGameArea.frameNo/10);
   myScore.update();
   myGamePiece.newPos();
+
   myGamePiece.gameOver();
   myGameArea.renderPlat();
   myGameArea.renderWall();
   myGamePiece.update();
-  for (i = 0; i < num; i += 1) {
+  if((myGameArea.frameNo/10) % 8 == 0){
+    myGameArea.newPlat();
+  }
+  for (i = 0; i < platforms.length; i += 1) {
     platforms[i].x += -1;
   }
+
+  console.log(platforms);
 }
 
 //Function to Check for Collisions between two entities
@@ -149,8 +166,9 @@ var collision = function(r1, r2) {
 
 var getGravitySpeed = function(){ //checks to see if player is on a platform and stops them from falling
  var i = 0;
-  while(i < num){
+  while(i < platforms.length){
     if(collision(myGamePiece, platforms[i])){
+      currentPlat = i;
       return true;
     }else{
       i++;
