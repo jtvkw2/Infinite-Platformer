@@ -4,6 +4,7 @@ var myScore; //Undefined score that will increase with frames as player survies
 var jumpTime = 0; //Used to time jumps in air
 var platforms = []; //Initial array to store all the platforms
 var endWall = [{x: 0, y: 0, width: 10, height: 270 }]; //Ending wall that follows and kills player
+var enemies = [];
 
 function startGame() { //initial function to start the game, called in index
     myGamePiece = new component(30, 30, "red", 30, 120); //the player
@@ -54,13 +55,31 @@ var myGameArea = {//variable for all function related to the canvas
       }
 
     },
-    newPlat: function(){
+    renderEnimies: function(){ //renders platforms to screen
+      var ctx = this.canvas.getContext("2d");
+      ctx.fillStyle = "#00FF00";
+      for(i=0; i<enemies.length; i++){
+        ctx.fillRect(enemies[i].x, enemies[i].y, enemies[i].width, enemies[i].height);
+      }
+
+    },
+    newPlat: function(){ //adds new platforms to array to be rendered
       platforms.push(
           {
           x: 100+(250 * getRandomArbitrary(1.25, 1.5)) + (currentPlat*200),
           y: 200 + getRandomArbitrary(-40,40),
           width: 110 + getRandomArbitrary(10,40),
           height: 15
+          }
+      );
+    },
+    newEnemy: function(){ //adds new platforms to array to be rendered
+      enemies.push(
+          {
+          x: 100+(250 * getRandomArbitrary(1.25, 1.5)) + (currentPlat*200),
+          y: 200 + getRandomArbitrary(-40,40),
+          width: 30,
+          height: 30,
           }
       );
     },
@@ -103,7 +122,7 @@ function component(width, height, color, x, y, type) { //establishs all players 
       }
   }
   this.gameOver = function() { //Creates end state of game
-    if(collision(myGamePiece, endWall[0]) === true || myGamePiece.y > 270){
+    if(collision(myGamePiece, endWall[0]) === true || myGamePiece.y > 270 || getEnemyCollison() == true){
       alert("GAME OVER");
       document.location.reload();
       clearInterval(interval);
@@ -137,16 +156,18 @@ function updateGameArea() { //calls all listed function every frame to update
   myScore.text = "SCORE: " + Math.round(myGameArea.frameNo/10);
   myScore.update();
   myGamePiece.newPos();
-
+  myGameArea.renderEnimies();
   myGamePiece.gameOver();
   myGameArea.renderPlat();
   myGameArea.renderWall();
   myGamePiece.update();
   if((myGameArea.frameNo/10) % 8 == 0){
     myGameArea.newPlat();
+    myGameArea.newEnemy();
   }
   for (i = 0; i < platforms.length; i += 1) {
     platforms[i].x += -1;
+    enemies[i].x += -1;
   }
 
   console.log(platforms);
@@ -169,6 +190,17 @@ var getGravitySpeed = function(){ //checks to see if player is on a platform and
   while(i < platforms.length){
     if(collision(myGamePiece, platforms[i])){
       currentPlat = i;
+      return true;
+    }else{
+      i++;
+    }
+  }
+}
+
+var getEnemyCollison = function(){ //checks to see if player is on a platform and stops them from falling
+ var i = 0;
+  while(i < enemies.length){
+    if(collision(myGamePiece, enemies[i])){
       return true;
     }else{
       i++;
