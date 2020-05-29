@@ -4,7 +4,7 @@ var myScore; //Undefined score that will increase with frames as player survies
 var jumpTime = 0; //Used to time jumps in air
 var platforms = []; //Initial array to store all the platforms
 var endWall = [{x: 0, y: 0, width: 10, height: 270 }]; //Ending wall that follows and kills player
-var enemies = [];
+var enemies = []; // Array to contain the enimies
 
 function startGame() { //initial function to start the game, called in index
     myGamePiece = new component(30, 30, "red", 30, 120); //the player
@@ -165,9 +165,13 @@ function updateGameArea() { //calls all listed function every frame to update
     myGameArea.newPlat();
     myGameArea.newEnemy();
   }
+
   for (i = 0; i < platforms.length; i += 1) {
     platforms[i].x += -1;
     enemies[i].x += -1;
+    if(i % 3 == 0){
+      enemies[i].y += -1;
+    }
   }
 
   console.log(platforms);
